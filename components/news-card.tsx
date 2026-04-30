@@ -6,6 +6,7 @@ import { ArrowUpRight } from "lucide-react";
 import { CategoryBadge } from "./category-badge";
 import { SourceBadge } from "./source-badge";
 import { timeAgo } from "@/lib/format";
+import { getCategory } from "@/lib/categories";
 import type { Article } from "@/lib/types";
 
 export function NewsCard({
@@ -19,6 +20,7 @@ export function NewsCard({
 }) {
   const isFeature = variant === "feature";
   const isCompact = variant === "compact";
+  const accent = getCategory(article.category)?.accent ?? "#22d3ee";
 
   return (
     <motion.div
@@ -29,13 +31,20 @@ export function NewsCard({
         delay: Math.min(index * 0.04, 0.3),
         ease: [0.22, 1, 0.36, 1],
       }}
-      whileHover={{ y: -2 }}
+      whileHover={{ y: -3 }}
       className={`group relative block w-full ${isFeature ? "md:col-span-2 md:row-span-2" : ""}`}
     >
       <Link
         href={`/article/${article.id}`}
-        className="block overflow-hidden rounded-2xl border border-border bg-surface text-left transition-colors hover:border-border-strong hover:bg-surface-hover"
+        className="card-glow block overflow-hidden rounded-2xl border border-border bg-surface text-left"
+        style={{ "--card-accent": accent + "55" } as React.CSSProperties}
       >
+        {/* Colored top accent line */}
+        <div
+          className="h-[2px] w-full transition-opacity duration-300 opacity-60 group-hover:opacity-100"
+          style={{ background: `linear-gradient(90deg, ${accent}, transparent)` }}
+        />
+
         <div
           className={`relative w-full overflow-hidden ${
             isFeature ? "aspect-[16/10]" : isCompact ? "aspect-[16/8]" : "aspect-[16/9]"
@@ -84,7 +93,10 @@ export function NewsCard({
             </p>
           )}
 
-          <div className="mt-1 flex items-center gap-1.5 text-[12px] text-foreground-muted opacity-0 transition-opacity group-hover:opacity-100">
+          <div
+            className="mt-1 flex items-center gap-1.5 text-[12px] font-medium opacity-0 transition-opacity group-hover:opacity-100"
+            style={{ color: accent }}
+          >
             Leer más
             <ArrowUpRight className="h-3.5 w-3.5" />
           </div>

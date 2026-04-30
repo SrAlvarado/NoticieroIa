@@ -1,9 +1,30 @@
 import type { Article } from "../types";
 
 // Primarios: Claude/Anthropic/MCP/agentes
-const PRIMARY_TOPICS = ["claude", "anthropic", "mcp", "model-context-protocol", "claude-code"];
-// Secundarios: desarrollo con IA en general
-const DEV_TOPICS = ["llm", "agents", "ai-sdk", "langchain", "openai", "gemini"];
+const PRIMARY_TOPICS = [
+  "claude",
+  "anthropic",
+  "mcp",
+  "model-context-protocol",
+  "claude-code",
+  "claude-api",
+  "anthropic-sdk",
+  "mcp-server",
+  "claude-skills",
+];
+// Secundarios: desarrollo con IA, buenas prácticas, clean code
+const DEV_TOPICS = [
+  "llm",
+  "ai-agents",
+  "ai-sdk",
+  "langchain",
+  "openai",
+  "clean-code",
+  "software-engineering",
+  "best-practices",
+  "design-patterns",
+  "refactoring",
+];
 
 const GITHUB_API = "https://api.github.com";
 

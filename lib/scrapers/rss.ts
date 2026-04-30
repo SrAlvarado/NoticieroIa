@@ -10,24 +10,18 @@ export type FeedConfig = {
 };
 
 export const RSS_FEEDS: FeedConfig[] = [
-  // Claude & Anthropic — prioridad máxima
+  // ── Claude & Anthropic ──────────────────────────────────────────
   {
     url: "https://www.anthropic.com/news/rss.xml",
     sourceName: "Anthropic News",
     defaultCategory: "claude",
   },
-  // Changelogs de modelos
   {
-    url: "https://openai.com/blog/rss.xml",
-    sourceName: "OpenAI Blog",
-    defaultCategory: "cambios",
+    url: "https://www.anthropic.com/research/rss.xml",
+    sourceName: "Anthropic Research",
+    defaultCategory: "claude",
   },
-  {
-    url: "https://blog.google/technology/ai/rss/",
-    sourceName: "Google AI Blog",
-    defaultCategory: "cambios",
-  },
-  // Desarrollo con IA
+  // ── Desarrollo con IA ───────────────────────────────────────────
   {
     url: "https://simonwillison.net/atom/everything/",
     sourceName: "Simon Willison",
@@ -38,7 +32,49 @@ export const RSS_FEEDS: FeedConfig[] = [
     sourceName: "Latent Space",
     defaultCategory: "desarrollo",
   },
-  // Noticias generales
+  {
+    url: "https://hnrss.org/frontpage",
+    sourceName: "Hacker News",
+    defaultCategory: "desarrollo",
+  },
+  {
+    url: "https://buttondown.com/ainews/rss",
+    sourceName: "AI News Newsletter",
+    defaultCategory: "desarrollo",
+  },
+  {
+    url: "https://www.deeplearning.ai/the-batch/feed/",
+    sourceName: "The Batch (DeepLearning.AI)",
+    defaultCategory: "desarrollo",
+  },
+  {
+    url: "https://martinfowler.com/feed.atom",
+    sourceName: "Martin Fowler",
+    defaultCategory: "desarrollo",
+  },
+  {
+    url: "https://feeds.feedburner.com/ThePragmaticEngineer",
+    sourceName: "The Pragmatic Engineer",
+    defaultCategory: "desarrollo",
+  },
+  // ── Changelogs & releases ───────────────────────────────────────
+  {
+    url: "https://openai.com/blog/rss.xml",
+    sourceName: "OpenAI Blog",
+    defaultCategory: "cambios",
+  },
+  {
+    url: "https://blog.google/technology/ai/rss/",
+    sourceName: "Google AI Blog",
+    defaultCategory: "cambios",
+  },
+  // ── Herramientas ────────────────────────────────────────────────
+  {
+    url: "https://huggingface.co/blog/feed.xml",
+    sourceName: "Hugging Face Blog",
+    defaultCategory: "herramientas",
+  },
+  // ── Noticias generales ──────────────────────────────────────────
   {
     url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
     sourceName: "The Verge AI",
@@ -50,9 +86,9 @@ export const RSS_FEEDS: FeedConfig[] = [
     defaultCategory: "noticias",
   },
   {
-    url: "https://hnrss.org/frontpage",
-    sourceName: "Hacker News",
-    defaultCategory: "desarrollo",
+    url: "https://venturebeat.com/category/ai/feed/",
+    sourceName: "VentureBeat AI",
+    defaultCategory: "noticias",
   },
 ];
 

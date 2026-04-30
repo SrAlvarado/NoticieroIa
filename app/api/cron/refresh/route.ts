@@ -4,6 +4,7 @@ import { scrapeReddit } from "@/lib/scrapers/reddit";
 import { scrapeGitHub } from "@/lib/scrapers/github";
 import { classifyBatch } from "@/lib/classifier";
 import { translateArticles } from "@/lib/translator";
+import { pickFallbackImage } from "@/lib/image-pool";
 import { getSupabaseServer, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { Article } from "@/lib/types";
 
@@ -78,6 +79,7 @@ export async function POST(req: NextRequest) {
     ...a,
     title: translations[i].title,
     summary: translations[i].summary,
+    imageUrl: a.imageUrl ?? pickFallbackImage(categories[i], a.sourceUrl),
   }));
 
   const { data: existing } = await sb

@@ -13,9 +13,10 @@ export function CategoryBadge({
     <span
       className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] font-medium uppercase tracking-[0.18em] ${className}`}
       style={{
-        borderColor: `${meta.accent}55`,
+        borderColor: `${meta.accent}60`,
         color: meta.accent,
-        background: `${meta.accent}10`,
+        background: `${meta.accent}18`,
+        boxShadow: `0 0 8px ${meta.accent}30`,
       }}
     >
       <span
