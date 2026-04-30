@@ -26,10 +26,17 @@
 
 > Nota Fase 3: Supabase TS client requiere tipos generados para el type checker. Se usa `SupabaseClient<any>` hasta que se ejecute `supabase gen types typescript`. Ver ADR-007.
 
-## Pendientes Fase 4 (Deploy)
-- [ ] Workflow `refresh.yml` en `.github/workflows/`.
-- [ ] Documentar en README cómo conectar a Vercel + Supabase.
-- [ ] Instrucciones finales de deploy.
+## Pendientes Fase 4 (Deploy) ✅
+- [x] Workflow `.github/workflows/refresh.yml` (cron `0 */2 * * *`, `workflow_dispatch`).
+- [x] README completo: Supabase setup, Vercel env vars, GitHub Actions secrets.
+- [x] Tabla de variables de entorno y guía de despliegue paso a paso.
+
+## Mejoras futuras (opcional)
+- [ ] Deep-link al detalle (`?article=id`) sin romper la animación hero.
+- [ ] Ejecutar `supabase gen types typescript` para type-safety completo en las queries.
+- [ ] Feed de X/Twitter vía Nitter/Mastodon (best-effort, actualmente omitido).
+- [ ] Paginación infinita en las secciones de categoría.
+- [ ] Preview social (og:image) generado dinámicamente con `@vercel/og`.
 
 ## Riesgos conocidos
 - **X/Twitter scraping**: Nitter/Mastodon no son fiables. Asumir best-effort y no romper el cron si fallan.
