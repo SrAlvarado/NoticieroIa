@@ -1,6 +1,10 @@
 import type { Article } from "../types";
 
-const TOPICS = ["ai", "llm", "agents", "mcp", "rag", "embeddings"];
+// Primarios: Claude/Anthropic/MCP/agentes
+const PRIMARY_TOPICS = ["claude", "anthropic", "mcp", "model-context-protocol", "claude-code"];
+// Secundarios: desarrollo con IA en general
+const DEV_TOPICS = ["llm", "agents", "ai-sdk", "langchain", "openai", "gemini"];
+
 const GITHUB_API = "https://api.github.com";
 
 type GhRepo = {
@@ -10,18 +14,18 @@ type GhRepo = {
   description: string | null;
   stargazers_count: number;
   created_at: string;
-  updated_at: string;
   owner: { avatar_url: string };
 };
 
 async function searchTopic(
   topic: string,
+  category: Article["category"],
   token?: string,
 ): Promise<Omit<Article, "id">[]> {
-  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
-  const url = `${GITHUB_API}/search/repositories?q=topic:${topic}+created:>${since}&sort=stars&order=desc&per_page=10`;
+  const url = `${GITHUB_API}/search/repositories?q=topic:${topic}+created:>${since}&sort=stars&order=desc&per_page=8`;
 
   const headers: Record<string, string> = {
     Accept: "application/vnd.github.v3+json",
@@ -39,13 +43,13 @@ async function searchTopic(
       title: `${r.full_name} · ${r.stargazers_count.toLocaleString("es-ES")} ⭐`,
       summary:
         r.description ??
-        `Nuevo repositorio de ${topic.toUpperCase()} con ${r.stargazers_count} estrellas.`,
+        `Nuevo repositorio sobre ${topic} con ${r.stargazers_count} estrellas en GitHub.`,
       content: null,
       imageUrl: r.owner.avatar_url ?? null,
       source: "github" as const,
       sourceName: r.full_name,
       sourceUrl: r.html_url,
-      category: "tools" as const,
+      category,
       publishedAt: r.created_at,
     }));
   } catch {
@@ -54,12 +58,24 @@ async function searchTopic(
 }
 
 export async function scrapeGitHub(token?: string): Promise<Omit<Article, "id">[]> {
-  const results = await Promise.allSettled(
-    TOPICS.map((t) => searchTopic(t, token)),
-  );
-  const all = results.flatMap((r) =>
-    r.status === "fulfilled" ? r.value : [],
-  );
+  const [primaryResults, devResults] = await Promise.allSettled([
+    Promise.allSettled(
+      PRIMARY_TOPICS.map((t) => searchTopic(t, "claude", token)),
+    ),
+    Promise.allSettled(
+      DEV_TOPICS.map((t) => searchTopic(t, "desarrollo", token)),
+    ),
+  ]);
+
+  const all = [
+    ...(primaryResults.status === "fulfilled"
+      ? primaryResults.value.flatMap((r) => (r.status === "fulfilled" ? r.value : []))
+      : []),
+    ...(devResults.status === "fulfilled"
+      ? devResults.value.flatMap((r) => (r.status === "fulfilled" ? r.value : []))
+      : []),
+  ];
+
   const seen = new Set<string>();
   return all.filter((a) => {
     if (seen.has(a.sourceUrl)) return false;

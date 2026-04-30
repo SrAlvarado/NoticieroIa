@@ -64,7 +64,7 @@ async function scrapeSubreddit(sub: string): Promise<Omit<Article, "id">[]> {
         source: "reddit" as const,
         sourceName: `r/${p.data.subreddit}`,
         sourceUrl: `https://reddit.com${p.data.permalink}`,
-        category: "news" as const,
+        category: "noticias" as const,
         publishedAt: new Date(p.data.created_utc * 1000).toISOString(),
       }));
   } catch {

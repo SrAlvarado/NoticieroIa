@@ -1,4 +1,4 @@
-export type CategorySlug = "tools" | "news" | "changes" | "new";
+export type CategorySlug = "claude" | "desarrollo" | "herramientas" | "noticias" | "cambios";
 
 export type SourceKind = "rss" | "reddit" | "github" | "twitter" | "mastodon";
 

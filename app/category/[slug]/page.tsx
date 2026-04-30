@@ -6,9 +6,7 @@ import { CATEGORIES, getCategory, isBreaking } from "@/lib/categories";
 import { getArticles } from "@/lib/articles";
 import type { CategorySlug } from "@/lib/types";
 
-export function generateStaticParams() {
-  return CATEGORIES.map((c) => ({ slug: c.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export default async function CategoryPage({
   params,

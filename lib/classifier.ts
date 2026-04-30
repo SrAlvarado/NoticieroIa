@@ -1,40 +1,39 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import type { CategorySlug } from "./types";
 
-const CATEGORIES_LIST = "tools | news | changes | new";
+const CATEGORIES_LIST = "claude | desarrollo | herramientas | noticias | cambios";
 
 const SYSTEM_PROMPT = `Eres un clasificador de noticias de IA. Clasifica el titular y resumen en UNA de estas categorías y responde SOLO con esa palabra:
 
-- tools      → nuevas herramientas, apps, SDKs, repositorios, productos de IA
-- news       → actualidad general del sector IA, investigaciones, análisis
-- changes    → changelogs, actualizaciones, deprecaciones, releases de modelos existentes
-- new        → tendencias emergentes, nuevos paradigmas, MCPs, frameworks, metodologías
+- claude      → Claude, Anthropic, MCPs, skills, hooks, agentes de Claude, Claude Code, Claude API
+- desarrollo  → SDKs, frameworks, repositorios GitHub, código, programación con IA, APIs de IA, herramientas para desarrolladores
+- herramientas → apps de IA, productos de consumo, servicios, startups de IA
+- noticias    → actualidad general del sector IA, investigación, análisis, empresas
+- cambios     → changelogs, actualizaciones, releases, deprecaciones, versiones nuevas de modelos
 
 Responde exclusivamente con una de estas palabras: ${CATEGORIES_LIST}`;
 
-const KEYWORD_RULES: Array<{ keywords: string[]; category: CategorySlug }> = [
+const KEYWORD_RULES: Array<{ keywords: RegExp[]; category: CategorySlug }> = [
   {
-    keywords: ["changelog", "update", "release", "v\\d+\\.", "deprecat", "migration"],
-    category: "changes",
+    keywords: [/claude/i, /anthropic/i, /\bmcp\b/i, /model.context.protocol/i, /claude.code/i, /\bskill\b/i, /\bhook\b/i],
+    category: "claude",
   },
   {
-    keywords: ["github", "repositor", "sdk", "library", "framework", "tool", "launch", "launch"],
-    category: "tools",
+    keywords: [/changelog/i, /release.note/i, /deprecat/i, /v\d+\.\d+/i, /model.update/i, /gpt-\d/i, /gemini \d/i],
+    category: "cambios",
   },
   {
-    keywords: ["mcp", "model context protocol", "skill", "hook", "harness", "agent framework"],
-    category: "new",
+    keywords: [/github/i, /repositor/i, /\bsdk\b/i, /\bapi\b/i, /open.source/i, /developer/i, /programm/i, /langchain/i, /framework/i],
+    category: "desarrollo",
   },
 ];
 
 function heuristicClassify(title: string, summary: string): CategorySlug {
-  const text = (title + " " + summary).toLowerCase();
+  const text = title + " " + summary;
   for (const rule of KEYWORD_RULES) {
-    if (rule.keywords.some((k) => new RegExp(k, "i").test(text))) {
-      return rule.category;
-    }
+    if (rule.keywords.some((k) => k.test(text))) return rule.category;
   }
-  return "news";
+  return "noticias";
 }
 
 let _genAI: GoogleGenerativeAI | null = null;
@@ -47,7 +46,7 @@ function getAI() {
   return _genAI;
 }
 
-const VALID: Set<string> = new Set(["tools", "news", "changes", "new"]);
+const VALID: Set<string> = new Set(["claude", "desarrollo", "herramientas", "noticias", "cambios"]);
 
 export async function classifyArticle(
   title: string,
@@ -61,17 +60,12 @@ export async function classifyArticle(
     const model = getAI().getGenerativeModel({ model: "gemini-2.0-flash" });
     const result = await model.generateContent({
       systemInstruction: SYSTEM_PROMPT,
-      contents: [
-        {
-          role: "user",
-          parts: [{ text: `Título: ${title}\nResumen: ${summary}` }],
-        },
-      ],
+      contents: [{ role: "user", parts: [{ text: `Título: ${title}\nResumen: ${summary}` }] }],
     });
     const raw = result.response.text().trim().toLowerCase().split(/\s/)[0];
     if (VALID.has(raw)) return raw as CategorySlug;
   } catch {
-    // fall through
+    // fall through to heuristic
   }
   return defaultCategory ?? heuristicClassify(title, summary);
 }
@@ -79,7 +73,5 @@ export async function classifyArticle(
 export async function classifyBatch(
   items: Array<{ title: string; summary: string; defaultCategory?: CategorySlug }>,
 ): Promise<CategorySlug[]> {
-  return Promise.all(
-    items.map((i) => classifyArticle(i.title, i.summary, i.defaultCategory)),
-  );
+  return Promise.all(items.map((i) => classifyArticle(i.title, i.summary, i.defaultCategory)));
 }
