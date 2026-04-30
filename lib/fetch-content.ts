@@ -43,15 +43,53 @@ export async function fetchGitHubReadme(
 }
 
 export function markdownToText(md: string): string {
-  return md
+  const cleaned = md
+    // HTML comments
+    .replace(/<!--[\s\S]*?-->/g, "")
+    // HTML tags (img, badges, etc.)
+    .replace(/<[^>]*>/g, "")
+    // Badge combo links [![...](...)](#)
+    .replace(/\[!\[[^\]]*\]\([^)]*\)\]\([^)]*\)/g, "")
+    // Image markdown
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, "")
+    // Empty links [](URL)
+    .replace(/\[\]\([^)]*\)/g, "")
+    // Code blocks
     .replace(/```[\s\S]*?```/g, "")
-    .replace(/`[^`]+`/g, (m) => m.slice(1, -1))
-    .replace(/^#{1,6}\s+/gm, "")
-    .replace(/!\[.*?\]\(.*?\)/g, "")
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    // Inline code — keep text
+    .replace(/`([^`\n]+)`/g, "$1")
+    // Headings — keep text as a section separator
+    .replace(/^#{1,6}\s+(.+)$/gm, "\n$1\n")
+    // Links — keep link text
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+    // Reference links [text][ref] → text
+    .replace(/\[([^\]]+)\]\[[^\]]*\]/g, "$1")
+    // Bold / italic
+    .replace(/\*{1,3}([^*\n]+)\*{1,3}/g, "$1")
+    .replace(/_{1,3}([^_\n]+)_{1,3}/g, "$1")
+    // Blockquotes
+    .replace(/^>\s*/gm, "")
+    // Table rows (lines surrounded by |)
+    .replace(/^\|.*\|$/gm, "")
+    // Table separator lines
+    .replace(/^[\s|:-]+$/gm, "")
+    // Horizontal rules
+    .replace(/^[-*_]{3,}\s*$/gm, "")
+    // Bullet lists
     .replace(/^\s*[-*+]\s+/gm, "• ")
+    // Numbered lists
     .replace(/^\s*\d+\.\s+/gm, "")
-    .replace(/[*_]{1,2}([^*_]+)[*_]{1,2}/g, "$1")
+    // Trailing whitespace per line
+    .replace(/[ \t]+$/gm, "")
+    // Collapse 3+ blank lines to 2
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  // Drop lines that are too short to be meaningful (likely badge/link remnants)
+  return cleaned
+    .split("\n")
+    .filter((line) => line.trim().length === 0 || line.trim().length > 5)
+    .join("\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }

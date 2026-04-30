@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowLeft, BookOpen, ExternalLink } from "lucide-react";
 import { getArticleById } from "@/lib/articles";
 import { fetchArticleContent } from "@/lib/fetch-content";
+import { translateContent } from "@/lib/translator";
 import { CategoryBadge } from "@/components/category-badge";
 import { SourceBadge } from "@/components/source-badge";
 import { timeAgo } from "@/lib/format";
@@ -10,28 +11,54 @@ import { timeAgo } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 function ArticleContent({ content }: { content: string }) {
+  const blocks = content
+    .split(/\n{2,}/)
+    .map((b) => b.trim())
+    .filter((b) => b.length > 10);
+
   return (
-    <div className="space-y-4 text-base leading-8 text-foreground/85">
-      {content
-        .split(/\n{2,}/)
-        .filter((p) => p.trim().length > 30)
-        .slice(0, 60)
-        .map((block, i) => {
-          if (block.startsWith("•")) {
-            const items = block.split("\n").filter((l) => l.trim());
-            return (
-              <ul key={i} className="space-y-2 pl-2">
-                {items.map((item, j) => (
-                  <li key={j} className="flex gap-3">
-                    <span className="mt-3 h-1 w-1 shrink-0 rounded-full bg-foreground-muted" />
-                    <span>{item.replace(/^•\s*/, "")}</span>
-                  </li>
-                ))}
-              </ul>
-            );
-          }
-          return <p key={i}>{block.trim()}</p>;
-        })}
+    <div className="space-y-5 text-base leading-8 text-foreground/85">
+      {blocks.map((block, i) => {
+        // Bullet group
+        if (block.includes("\n") && block.split("\n").every((l) => l.startsWith("•") || l.trim() === "")) {
+          const items = block.split("\n").filter((l) => l.trim().startsWith("•"));
+          return (
+            <ul key={i} className="space-y-2 pl-1">
+              {items.map((item, j) => (
+                <li key={j} className="flex gap-3">
+                  <span className="mt-3 h-1 w-1 shrink-0 rounded-full bg-foreground-muted" />
+                  <span>{item.replace(/^•\s*/, "")}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        // Single bullet line
+        if (block.startsWith("•")) {
+          return (
+            <ul key={i} className="space-y-2 pl-1">
+              {block.split("\n").filter((l) => l.trim()).map((item, j) => (
+                <li key={j} className="flex gap-3">
+                  <span className="mt-3 h-1 w-1 shrink-0 rounded-full bg-foreground-muted" />
+                  <span>{item.replace(/^•\s*/, "")}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+
+        // Short line that looks like a section heading (< 80 chars, no period at end)
+        if (block.length < 80 && !block.endsWith(".") && !block.endsWith(",")) {
+          return (
+            <h2 key={i} className="pt-2 text-lg font-semibold text-foreground">
+              {block}
+            </h2>
+          );
+        }
+
+        return <p key={i}>{block}</p>;
+      })}
     </div>
   );
 }
@@ -45,10 +72,18 @@ export default async function ArticlePage({
   const article = await getArticleById(id);
   if (!article) notFound();
 
-  const contentResult = await fetchArticleContent(
-    article.sourceUrl,
-    process.env.GITHUB_TOKEN,
-  );
+  const [contentResult] = await Promise.all([
+    fetchArticleContent(article.sourceUrl, process.env.GITHUB_TOKEN),
+  ]);
+
+  let displayContent: string | null = null;
+  let truncated = false;
+
+  if (contentResult.type !== "empty") {
+    const raw = contentResult.content;
+    truncated = raw.length > 5000;
+    displayContent = await translateContent(raw);
+  }
 
   return (
     <div className="relative min-h-screen">
@@ -96,15 +131,18 @@ export default async function ArticlePage({
 
         {/* Content */}
         <div className="border-t border-border pt-8">
-          {contentResult.type !== "empty" ? (
+          {displayContent ? (
             <div>
               <div className="mb-6 flex items-center gap-2 text-[11px] uppercase tracking-[0.14em] text-foreground-faint">
                 <BookOpen className="h-3.5 w-3.5" />
                 {contentResult.type === "readme"
                   ? "README del repositorio"
                   : "Artículo completo"}
+                {truncated && (
+                  <span className="ml-1 normal-case">(extracto)</span>
+                )}
               </div>
-              <ArticleContent content={contentResult.content} />
+              <ArticleContent content={displayContent} />
             </div>
           ) : (
             <p className="py-4 text-sm text-foreground-faint">

@@ -45,6 +45,29 @@ async function translateBatchWithGemini(
   return parsed;
 }
 
+const CONTENT_PROMPT = `Eres un traductor especializado en tecnología e inteligencia artificial.
+Traduce al español el texto que te proporcionen.
+Conserva los saltos de línea originales.
+Conserva términos técnicos en inglés cuando sea lo habitual (API, SDK, LLM, prompt, token, etc.).
+Devuelve ÚNICAMENTE el texto traducido, sin prefijos ni explicaciones.`;
+
+// Translate a single block of text (article body or README excerpt).
+// Caps at 5000 chars to keep latency reasonable; returns original on failure.
+export async function translateContent(text: string): Promise<string> {
+  if (!process.env.GEMINI_API_KEY) return text;
+  const excerpt = text.slice(0, 5000);
+  try {
+    const model = getAI().getGenerativeModel({ model: "gemini-2.0-flash" });
+    const result = await model.generateContent({
+      systemInstruction: CONTENT_PROMPT,
+      contents: [{ role: "user", parts: [{ text: excerpt }] }],
+    });
+    return result.response.text().trim();
+  } catch {
+    return excerpt;
+  }
+}
+
 export async function translateArticles(
   items: TranslationInput[],
 ): Promise<TranslationOutput[]> {
