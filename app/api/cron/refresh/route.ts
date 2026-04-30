@@ -3,6 +3,7 @@ import { scrapeAllRss } from "@/lib/scrapers/rss";
 import { scrapeReddit } from "@/lib/scrapers/reddit";
 import { scrapeGitHub } from "@/lib/scrapers/github";
 import { classifyBatch } from "@/lib/classifier";
+import { translateArticles } from "@/lib/translator";
 import { getSupabaseServer, isSupabaseConfigured } from "@/lib/supabase/server";
 import type { Article } from "@/lib/types";
 
@@ -62,16 +63,25 @@ export async function POST(req: NextRequest) {
 
   const classified = raw.map((a, i) => ({ ...a, category: categories[i] }));
 
+  const translations = await translateArticles(
+    classified.map((a) => ({ title: a.title, summary: a.summary })),
+  );
+  const translated = classified.map((a, i) => ({
+    ...a,
+    title: translations[i].title,
+    summary: translations[i].summary,
+  }));
+
   const sb = getSupabaseServer();
 
   const { data: existing } = await sb
     .from("articles")
     .select("source_url")
-    .in("source_url", classified.map((a) => a.sourceUrl));
+    .in("source_url", translated.map((a) => a.sourceUrl));
 
   const existingUrls = new Set((existing ?? []).map((r: { source_url: string }) => r.source_url));
 
-  const toInsert = classified
+  const toInsert = translated
     .filter((a) => !existingUrls.has(a.sourceUrl))
     .map((a) => ({
       title: a.title,
