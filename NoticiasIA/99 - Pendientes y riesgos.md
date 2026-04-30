@@ -1,16 +1,19 @@
 # 99 — Pendientes y riesgos
 
-## Pendientes inmediatos (Fase 1)
-- [ ] `npx create-next-app` en la raíz del proyecto.
-- [ ] Instalar Framer Motion, Lucide, rss-parser, Supabase JS, Gemini SDK, article-extractor.
-- [ ] Configurar Tailwind v4 + tema dark premium.
-- [ ] Crear `.env.example` con todas las variables.
+## Pendientes inmediatos (Fase 1) ✅
+- [x] `npx create-next-app` en la raíz del proyecto.
+- [x] Instalar Framer Motion, Lucide, rss-parser, Supabase JS, Gemini SDK, article-extractor.
+- [x] Configurar Tailwind v4 + tema dark premium.
+- [x] Crear `.env.example` con todas las variables.
 
-## Pendientes Fase 2 (UI)
-- [ ] Layout principal con header y nav de categorías.
-- [ ] Componente `NewsCard` con hover y `layoutId`.
-- [ ] Modal/route de detalle con animación hero a fullscreen.
-- [ ] Sección "Última hora" destacada arriba.
+## Pendientes Fase 2 (UI) ✅
+- [x] Layout principal con header y nav de categorías.
+- [x] Componente `NewsCard` con hover y `layoutId`.
+- [x] Modal/route de detalle con animación hero a fullscreen.
+- [x] Sección "Última hora" destacada arriba.
+- [x] Página por categoría `/category/[slug]`.
+
+> Nota: `lucide-react@1.x` ha eliminado el icono `Github` (motivos de marca). Sustituido por `GitBranch` para fuentes tipo `github`.
 
 ## Pendientes Fase 3 (Scrapers)
 - [ ] Servicio RSS multi-feed con dedupe.
