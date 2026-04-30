@@ -37,6 +37,14 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const sb = getSupabaseServer();
+
+  // ?reset=1 wipes the table before inserting fresh translated articles
+  const reset = req.nextUrl.searchParams.get("reset") === "1";
+  if (reset) {
+    await sb.from("articles").delete().neq("id", "00000000-0000-0000-0000-000000000000");
+  }
+
   const [rss, reddit, github] = await Promise.allSettled([
     scrapeAllRss(),
     scrapeReddit(),
@@ -71,8 +79,6 @@ export async function POST(req: NextRequest) {
     title: translations[i].title,
     summary: translations[i].summary,
   }));
-
-  const sb = getSupabaseServer();
 
   const { data: existing } = await sb
     .from("articles")
