@@ -10,40 +10,49 @@ export type FeedConfig = {
 };
 
 export const RSS_FEEDS: FeedConfig[] = [
+  // Claude & Anthropic — prioridad máxima
   {
     url: "https://www.anthropic.com/news/rss.xml",
     sourceName: "Anthropic News",
-    defaultCategory: "changes",
+    defaultCategory: "claude",
   },
+  // Changelogs de modelos
   {
     url: "https://openai.com/blog/rss.xml",
     sourceName: "OpenAI Blog",
-    defaultCategory: "news",
+    defaultCategory: "cambios",
   },
   {
     url: "https://blog.google/technology/ai/rss/",
     sourceName: "Google AI Blog",
-    defaultCategory: "news",
+    defaultCategory: "cambios",
   },
+  // Desarrollo con IA
+  {
+    url: "https://simonwillison.net/atom/everything/",
+    sourceName: "Simon Willison",
+    defaultCategory: "desarrollo",
+  },
+  {
+    url: "https://www.latent.space/feed",
+    sourceName: "Latent Space",
+    defaultCategory: "desarrollo",
+  },
+  // Noticias generales
   {
     url: "https://www.theverge.com/ai-artificial-intelligence/rss/index.xml",
     sourceName: "The Verge AI",
-    defaultCategory: "news",
+    defaultCategory: "noticias",
   },
   {
     url: "https://techcrunch.com/category/artificial-intelligence/feed/",
     sourceName: "TechCrunch AI",
-    defaultCategory: "news",
+    defaultCategory: "noticias",
   },
   {
     url: "https://hnrss.org/frontpage",
     sourceName: "Hacker News",
-    defaultCategory: "news",
-  },
-  {
-    url: "http://export.arxiv.org/rss/cs.AI",
-    sourceName: "arXiv cs.AI",
-    defaultCategory: "new",
+    defaultCategory: "desarrollo",
   },
 ];
 
@@ -63,17 +72,16 @@ function extractImage(item: Parser.Item & Record<string, unknown>): string | nul
 }
 
 function summarize(item: Parser.Item & Record<string, unknown>): string {
-  const raw =
-    ((item["content:encoded"] ?? item.content ?? item.summary ?? "") as string)
-      .replace(/<[^>]*>/g, "")
-      .replace(/\s+/g, " ")
-      .trim();
-  return raw.slice(0, 280) + (raw.length > 280 ? "…" : "");
+  const raw = (
+    (item["content:encoded"] ?? item.content ?? item.summary ?? "") as string
+  )
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  return raw.slice(0, 320) + (raw.length > 320 ? "…" : "");
 }
 
-export async function scrapeRssFeed(
-  feed: FeedConfig,
-): Promise<Omit<Article, "id">[]> {
+export async function scrapeRssFeed(feed: FeedConfig): Promise<Omit<Article, "id">[]> {
   try {
     const result = await parser.parseURL(feed.url);
     return (result.items ?? []).slice(0, 20).map((item) => ({
@@ -93,9 +101,7 @@ export async function scrapeRssFeed(
 }
 
 export async function scrapeAllRss(): Promise<Omit<Article, "id">[]> {
-  const results = await Promise.allSettled(
-    RSS_FEEDS.map((f) => scrapeRssFeed(f)),
-  );
+  const results = await Promise.allSettled(RSS_FEEDS.map((f) => scrapeRssFeed(f)));
   return results
     .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
     .filter((a) => a.sourceUrl);

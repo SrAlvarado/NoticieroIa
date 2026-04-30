@@ -11,32 +11,39 @@ export const CATEGORIES: readonly CategoryMeta[] = [
     description: `Lo más reciente de las últimas ${BREAKING_HOURS} horas.`,
   },
   {
-    slug: "tools",
+    slug: "claude",
+    label: "Claude & Anthropic",
+    short: "Claude",
+    accent: "#f97316",
+    description: "Novedades de Claude, Anthropic, MCPs, skills y el ecosistema de agentes.",
+  },
+  {
+    slug: "desarrollo",
+    label: "Desarrollo con IA",
+    short: "Desarrollo",
+    accent: "#22d3ee",
+    description: "SDKs, frameworks, repositorios y herramientas para desarrollar con IA.",
+  },
+  {
+    slug: "herramientas",
     label: "Herramientas",
     short: "Herramientas",
-    accent: "#22d3ee",
-    description: "Nuevos lanzamientos, productos y repositorios de IA.",
+    accent: "#a78bfa",
+    description: "Nuevas apps, productos y servicios de IA.",
   },
   {
-    slug: "news",
+    slug: "noticias",
     label: "Noticias",
     short: "Noticias",
-    accent: "#a78bfa",
-    description: "Actualidad general del sector.",
+    accent: "#60a5fa",
+    description: "Actualidad general del sector de la inteligencia artificial.",
   },
   {
-    slug: "changes",
-    label: "Cambios",
+    slug: "cambios",
+    label: "Cambios & Releases",
     short: "Cambios",
-    accent: "#f59e0b",
-    description: "Changelogs y actualizaciones de modelos.",
-  },
-  {
-    slug: "new",
-    label: "Nuevo",
-    short: "Nuevo",
     accent: "#34d399",
-    description: "Tendencias emergentes: MCPs, frameworks, paradigmas.",
+    description: "Changelogs, actualizaciones y deprecaciones de modelos y servicios.",
   },
 ] as const;
 
@@ -54,5 +61,7 @@ export function isBreaking(publishedAt: string): boolean {
 }
 
 export function nonBreakingCategories(): CategoryMeta[] {
-  return CATEGORIES.filter((c): c is CategoryMeta & { slug: CategorySlug } => c.slug !== "breaking");
+  return CATEGORIES.filter(
+    (c): c is CategoryMeta & { slug: CategorySlug } => c.slug !== "breaking",
+  );
 }

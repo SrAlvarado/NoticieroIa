@@ -2,7 +2,26 @@ import { NewsCard } from "./news-card";
 import type { Article } from "@/lib/types";
 
 export function LatestHero({ articles }: { articles: Article[] }) {
-  if (articles.length === 0) return null;
+  if (articles.length === 0) {
+    return (
+      <section className="relative border-b border-border">
+        <div className="absolute inset-0 -z-10 bg-aurora" aria-hidden />
+        <div className="absolute inset-0 -z-10 bg-grid" aria-hidden />
+        <div className="mx-auto max-w-7xl px-5 pb-16 pt-20 md:px-8 md:pt-28">
+          <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-border-strong bg-surface px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-foreground-muted">
+            <span className="pulse-dot inline-block h-1.5 w-1.5 rounded-full bg-rose-400" />
+            Última hora
+          </div>
+          <h1 className="text-4xl font-semibold tracking-tight md:text-6xl">
+            Tu radar de <span className="text-gradient">IA</span> está listo.
+          </h1>
+          <p className="mt-3 max-w-xl text-foreground-muted md:text-lg">
+            Las primeras noticias llegarán en el próximo ciclo del cron (cada 2 horas).
+          </p>
+        </div>
+      </section>
+    );
+  }
   const [primary, ...rest] = articles;
   const secondary = rest.slice(0, 4);
 
