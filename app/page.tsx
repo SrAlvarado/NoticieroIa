@@ -3,6 +3,8 @@ import { CategorySection } from "@/components/category-section";
 import { getArticles, getBreakingArticles } from "@/lib/articles";
 import { nonBreakingCategories } from "@/lib/categories";
 
+export const dynamic = "force-dynamic";
+
 export default async function HomePage() {
   const [breaking, all] = await Promise.all([
     getBreakingArticles(),
