@@ -15,17 +15,21 @@
 
 > Nota: `lucide-react@1.x` ha eliminado el icono `Github` (motivos de marca). Sustituido por `GitBranch` para fuentes tipo `github`.
 
-## Pendientes Fase 3 (Scrapers)
-- [ ] Servicio RSS multi-feed con dedupe.
-- [ ] Servicio Reddit con User-Agent.
-- [ ] Servicio GitHub trending.
-- [ ] Cliente Gemini para clasificación.
-- [ ] Endpoint `/api/cron/refresh` con auth por `CRON_SECRET`.
+## Pendientes Fase 3 (Scrapers) ✅
+- [x] Servicio RSS multi-feed con dedupe (`lib/scrapers/rss.ts`, 7 feeds configurados).
+- [x] Servicio Reddit con User-Agent (`lib/scrapers/reddit.ts`, 6 subreddits).
+- [x] Servicio GitHub trending (`lib/scrapers/github.ts`, 6 topics, 7 días).
+- [x] Cliente Gemini para clasificación (`lib/classifier.ts`, fallback heurístico).
+- [x] Endpoint `/api/cron/refresh` con auth por `CRON_SECRET`.
+- [x] Migración SQL en `supabase/migrations/0001_init.sql`.
+- [x] `lib/articles.ts` usa Supabase si hay env vars, mock si no.
+
+> Nota Fase 3: Supabase TS client requiere tipos generados para el type checker. Se usa `SupabaseClient<any>` hasta que se ejecute `supabase gen types typescript`. Ver ADR-007.
 
 ## Pendientes Fase 4 (Deploy)
 - [ ] Workflow `refresh.yml` en `.github/workflows/`.
 - [ ] Documentar en README cómo conectar a Vercel + Supabase.
-- [ ] Migración SQL para crear `articles`.
+- [ ] Instrucciones finales de deploy.
 
 ## Riesgos conocidos
 - **X/Twitter scraping**: Nitter/Mastodon no son fiables. Asumir best-effort y no romper el cron si fallan.
