@@ -82,3 +82,16 @@ Log cronológico de decisiones importantes (ADRs ligeros). Cada entrada: **Conte
 **Trade-off:**
 - ✅ Cero dependencias extra, alineado con la política de Lucide.
 - ❌ El icono no representa la marca exactamente.
+
+---
+
+## ADR-007 — `SupabaseClient<any>` por ausencia de tipos generados
+**Fecha:** 2026-04-30
+
+**Contexto:** El tipo checker de Supabase JS v2 usa generics basados en el schema de la BD. Sin ejecutar `supabase gen types typescript`, el tipo de las tablas es `never`.
+
+**Decisión:** Usar `SupabaseClient<any>` en el cliente server-side hasta configurar Supabase CLI en el proyecto.
+
+**Trade-off:**
+- ✅ Build pasa sin setup extra del CLI.
+- ❌ Se pierde type-safety en queries. Para activarlo: `npx supabase gen types typescript --project-id <id> > lib/supabase/database.types.ts` y sustituir `any` por el tipo generado.
