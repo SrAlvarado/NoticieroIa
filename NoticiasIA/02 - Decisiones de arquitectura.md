@@ -56,3 +56,29 @@ Log cronológico de decisiones importantes (ADRs ligeros). Cada entrada: **Conte
 **Trade-off:**
 - ✅ Transición nativa, performante, declarativa.
 - ❌ Requiere mantener el mismo `layoutId` y estructura compatible entre origen y destino.
+
+---
+
+## ADR-005 — Modal global con Context, no rutas paralelas
+**Fecha:** 2026-04-30
+
+**Contexto:** La animación tarjeta → modal necesita compartir el `layoutId` entre origen (grid) y destino (modal). Opciones: rutas paralelas + intercepting (`@modal/(...)news/[id]`) o un Context client-side.
+
+**Decisión:** `NewsModalProvider` con `useState` + `AnimatePresence`. Se monta en `app/layout.tsx`, todas las cards lo consumen vía `useNewsModal()`.
+
+**Trade-off:**
+- ✅ Simple, sin acoplamiento a la jerarquía de rutas, animación fluida garantizada.
+- ❌ No hay deep-link al detalle (de momento). Si se necesita, añadir `?article=slug` con `router.replace` sin romper la animación.
+
+---
+
+## ADR-006 — Icono `GitBranch` en vez de `Github`
+**Fecha:** 2026-04-30
+
+**Contexto:** `lucide-react@1.x` retiró iconos de marca (incluido `Github`).
+
+**Decisión:** Usar `GitBranch` para fuentes tipo `github`. Si más adelante se requiere el logo oficial, embeber un SVG propio.
+
+**Trade-off:**
+- ✅ Cero dependencias extra, alineado con la política de Lucide.
+- ❌ El icono no representa la marca exactamente.
