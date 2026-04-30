@@ -63,7 +63,8 @@ export async function translateContent(text: string): Promise<string> {
       contents: [{ role: "user", parts: [{ text: excerpt }] }],
     });
     return result.response.text().trim();
-  } catch {
+  } catch (err) {
+    console.error("[translateContent] Gemini error:", err);
     return excerpt;
   }
 }

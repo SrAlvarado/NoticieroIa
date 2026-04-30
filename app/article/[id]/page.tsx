@@ -9,6 +9,7 @@ import { SourceBadge } from "@/components/source-badge";
 import { timeAgo } from "@/lib/format";
 
 export const dynamic = "force-dynamic";
+export const maxDuration = 60;
 
 function ArticleContent({ content }: { content: string }) {
   const blocks = content
