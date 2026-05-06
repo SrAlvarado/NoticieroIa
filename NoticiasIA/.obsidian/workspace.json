@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "05 - Esquema de datos.md",
+                "file": "README.md",
                 "mode": "preview",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "05 - Esquema de datos"
+              "title": "README"
             }
           }
         ]
@@ -186,10 +186,10 @@
   "active": "520342822ecf1699",
   "lastOpenFiles": [
     "Bienvenido.md",
+    "05 - Esquema de datos.md",
     "README.md",
     "02 - Decisiones de arquitectura.md",
     "03 - Fuentes de datos.md",
-    "05 - Esquema de datos.md",
     "01 - Stack tecnologico.md",
     "99 - Pendientes y riesgos.md.tmp.44012.1777536041072",
     "02 - Decisiones de arquitectura.md.tmp.44012.1777535970159",

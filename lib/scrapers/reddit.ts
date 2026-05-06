@@ -5,6 +5,8 @@ const SUBREDDITS = [
   "artificial",
   "singularity",
   "ClaudeAI",
+  "ClaudeCode",
+  "mcp",
   "OpenAI",
   "MachineLearning",
 ];
@@ -72,11 +74,19 @@ async function scrapeSubreddit(sub: string): Promise<Omit<Article, "id">[]> {
   }
 }
 
+const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
 export async function scrapeReddit(): Promise<Omit<Article, "id">[]> {
-  const results = await Promise.allSettled(
-    SUBREDDITS.map((s) => scrapeSubreddit(s)),
-  );
-  return results
-    .flatMap((r) => (r.status === "fulfilled" ? r.value : []))
-    .filter((a) => a.sourceUrl);
+  const results: Omit<Article, "id">[] = [];
+  for (const s of SUBREDDITS) {
+    try {
+      const articles = await scrapeSubreddit(s);
+      results.push(...articles);
+    } catch (e) {
+      console.error(`[Reddit] Error scraping r/${s}`, e);
+    }
+    // Anti-429 jitter: 1.5 to 3.0 seconds
+    await delay(1500 + Math.random() * 1500);
+  }
+  return results.filter((a) => a.sourceUrl);
 }

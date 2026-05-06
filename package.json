@@ -12,6 +12,7 @@
     "@extractus/article-extractor": "^8.0.20",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.105.1",
+    "agent-twitter-client": "^0.0.18",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.14.0",
     "next": "16.2.4",

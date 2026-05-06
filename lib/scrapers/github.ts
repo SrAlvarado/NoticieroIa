@@ -1,7 +1,7 @@
 import type { Article } from "../types";
 
 // Primarios: Claude/Anthropic/MCP/agentes
-const PRIMARY_TOPICS = [
+const PRIMARY_KEYWORDS = [
   "claude",
   "anthropic",
   "mcp",
@@ -10,7 +10,8 @@ const PRIMARY_TOPICS = [
   "claude-api",
   "anthropic-sdk",
   "mcp-server",
-  "claude-skills",
+  "claude-skill",
+  "gemini-flash",
 ];
 // Secundarios: desarrollo con IA, buenas prácticas, clean code
 const DEV_TOPICS = [
@@ -38,15 +39,16 @@ type GhRepo = {
   owner: { avatar_url: string };
 };
 
-async function searchTopic(
-  topic: string,
+async function searchKeyword(
+  keyword: string,
   category: Article["category"],
   token?: string,
 ): Promise<Omit<Article, "id">[]> {
   const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000)
     .toISOString()
     .slice(0, 10);
-  const url = `${GITHUB_API}/search/repositories?q=topic:${topic}+created:>${since}&sort=stars&order=desc&per_page=8`;
+  // Remove topic: restriction to search in name, description, and readme
+  const url = `${GITHUB_API}/search/repositories?q=${keyword}+created:>${since}&sort=stars&order=desc&per_page=8`;
 
   const headers: Record<string, string> = {
     Accept: "application/vnd.github.v3+json",
@@ -64,7 +66,7 @@ async function searchTopic(
       title: `${r.full_name} · ${r.stargazers_count.toLocaleString("es-ES")} ⭐`,
       summary:
         r.description ??
-        `Nuevo repositorio sobre ${topic} con ${r.stargazers_count} estrellas en GitHub.`,
+        `Nuevo repositorio sobre ${keyword} con ${r.stargazers_count} estrellas en GitHub.`,
       content: null,
       imageUrl: r.owner.avatar_url ?? null,
       source: "github" as const,
@@ -81,10 +83,10 @@ async function searchTopic(
 export async function scrapeGitHub(token?: string): Promise<Omit<Article, "id">[]> {
   const [primaryResults, devResults] = await Promise.allSettled([
     Promise.allSettled(
-      PRIMARY_TOPICS.map((t) => searchTopic(t, "claude", token)),
+      PRIMARY_KEYWORDS.map((k) => searchKeyword(k, "claude", token)),
     ),
     Promise.allSettled(
-      DEV_TOPICS.map((t) => searchTopic(t, "desarrollo", token)),
+      DEV_TOPICS.map((k) => searchKeyword(k, "desarrollo", token)),
     ),
   ]);
 

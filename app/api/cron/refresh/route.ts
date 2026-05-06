@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { scrapeAllRss } from "@/lib/scrapers/rss";
 import { scrapeReddit } from "@/lib/scrapers/reddit";
 import { scrapeGitHub } from "@/lib/scrapers/github";
+import { scrapeTwitter } from "@/lib/scrapers/twitter";
 import { classifyBatch } from "@/lib/classifier";
+import { preFilterArticles } from "@/lib/filter";
 import { translateArticles } from "@/lib/translator";
 import { pickFallbackImage } from "@/lib/image-pool";
 import { getSupabaseServer, isSupabaseConfigured } from "@/lib/supabase/server";
@@ -46,31 +48,39 @@ export async function POST(req: NextRequest) {
     await sb.from("articles").delete().neq("id", "00000000-0000-0000-0000-000000000000");
   }
 
-  const [rss, reddit, github] = await Promise.allSettled([
+  const [rss, reddit, github, twitter] = await Promise.allSettled([
     scrapeAllRss(),
     scrapeReddit(),
     scrapeGitHub(process.env.GITHUB_TOKEN),
+    scrapeTwitter(process.env.TWITTER_COOKIES),
   ]);
 
   const raw: ArticleInput[] = dedupeByUrl([
     ...(rss.status === "fulfilled" ? rss.value : []),
     ...(reddit.status === "fulfilled" ? reddit.value : []),
     ...(github.status === "fulfilled" ? github.value : []),
+    ...(twitter.status === "fulfilled" ? twitter.value : []),
   ]);
 
   if (raw.length === 0) {
     return NextResponse.json({ inserted: 0, skipped: 0, errors: [] });
   }
 
+  const filtered = preFilterArticles(raw);
+
+  if (filtered.length === 0) {
+    return NextResponse.json({ inserted: 0, skipped: raw.length, errors: [] });
+  }
+
   const categories = await classifyBatch(
-    raw.map((a) => ({
+    filtered.map((a) => ({
       title: a.title,
       summary: a.summary,
       defaultCategory: a.category,
     })),
   );
 
-  const classified = raw.map((a, i) => ({ ...a, category: categories[i] }));
+  const classified = filtered.map((a, i) => ({ ...a, category: categories[i] }));
 
   const translations = await translateArticles(
     classified.map((a) => ({ title: a.title, summary: a.summary })),
