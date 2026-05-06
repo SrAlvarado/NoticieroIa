@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  serverExternalPackages: ["agent-twitter-client", "@roamhq/wrtc"],
 };
 
 export default nextConfig;
